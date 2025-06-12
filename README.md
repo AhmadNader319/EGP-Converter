@@ -117,7 +117,7 @@ These details should be configured in your application's connection logic.
 
 The database schema is designed to efficiently store daily exchange rates for selected currencies:
 
-```mermaid
+```
 ERD (ER Diagram)
     DB2_HISTORICAL_TABLE_1 {
         timestamp date
