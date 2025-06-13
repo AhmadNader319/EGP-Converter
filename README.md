@@ -119,7 +119,7 @@ The database schema is designed to efficiently store daily exchange rates for se
 
 ```
 ERD (ER Diagram)
-    DB2_HISTORICAL_TABLE_1 {
+    CURRENCY_RATES {
         timestamp date
         varchar base
         numeric EGP_Rate
