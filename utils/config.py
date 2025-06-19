@@ -2,8 +2,8 @@ import ibm_db
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env.api file
+load_dotenv(dotenv_path='./.env.api')
 
 DB2_NAME = os.getenv("DB2_NAME")
 DB2_HOSTNAME = os.getenv("DB2_HOSTNAME")
@@ -16,3 +16,5 @@ DB2_HISTORICAL_TABLE = os.getenv("DB2_HISTORICAL_TABLE_1")
 DB2_CURRENCY_RATE_TABLE = os.getenv("CURRENCY_RATES")
 BASE_URL = os.getenv("BASE_URL")
 BACKUP_ACCESS_KEY = os.getenv("BACKUP_ACCESS_KEY")
+
+print(DB2_NAME, DB2_HOSTNAME, DB2_UID)

@@ -144,8 +144,8 @@ ERD (ER Diagram)
 
 | Purpose          | Endpoint Example                                                                                   |
 |------------------|--------------------------------------------------------------------------------------------------|
-| Latest Rates     | `https://api.currencyfreaks.com/v2.0/latest?apikey=API_KEY`                                       |
-| Historical Rates | `https://api.currencyfreaks.com/v2.0/<YYYY-MM-DD>?apikey=API_KEY&symbols=USD,CAD,EUR`             |
+| Latest Rates     | `https://api.exchangeratesapi.io/v1/latest?access_key=API_KEY`                                       |
+| Historical Rates | `https://api.exchangeratesapi.io/v1/YYYY-MM-DD?access_key={API_KEY}`             |
 
 ---
 
