@@ -1,11 +1,8 @@
 import requests
 import time
 from .config import (BASE_URL, ACCESS_KEY)
-# --- Reformat date to American Date format
-def _format_date_component(component):
-     return f"0{component}" if component < 10 else str(component)
-
-
+from .conversion_utils import _format_date_component
+print(_format_date_component(5))
 # --- Fetch current/latest data https://api.exchangeratesapi.io/v1/latest?access_key=API_KEY in real-time
 def _get_api_latest_data():
     url = f"{BASE_URL}latest?access_key={ACCESS_KEY}"

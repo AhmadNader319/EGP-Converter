@@ -1,7 +1,7 @@
 from utils import api_data_utils
 from utils import db2_utils
 
-def _extract_historical_month_data():
+def _extract_historical_month_data(year, month):
     return api_data_utils._fetch_currency_data_for_month(year, month)
 
 def _extract_historical_data_from_db(table_name = "historical_rates_2013_05"):
@@ -15,7 +15,8 @@ def _extract_last_ten_data():
 
 def _save_historical_data_into_csv(csv_file_name):
     with open(csv_file_name, 'w', newline='') as csvfile:
-            for row in _extract_historical_data_from_db()[:]:
+            historical_data = _extract_historical_data_from_db()
+            for row in historical_data[:]:
                 if (row != '\\n'):
                     for data in row.values():
                         if (data != "None"):
