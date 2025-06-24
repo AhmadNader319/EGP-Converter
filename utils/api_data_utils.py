@@ -45,7 +45,7 @@ def _fetch_currency_data(year: int, month: int, day: int) -> dict:
 # --- Fetch currency data for a month
 def _fetch_currency_data_for_month(year, month) -> dict:
     month_data = {}
-    for day in range(1,26):
+    for day in range(1,31):
         month_data[day] = _fetch_currency_data(year,month,day)
     return month_data
 
