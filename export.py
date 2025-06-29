@@ -3,9 +3,10 @@ from utils import db2_utils
 from utils import csv_utils
 
 def _extract_historical_month_data(year: int, month: int):
-    if isinstance(year, int):
+    print(type(year), " : ", type(month))
+    if not isinstance(year, int):
         raise TypeError("year should be an integer")
-    if isinstance(month, int):
+    if not isinstance(month, int):
         raise TypeError("month should be an integer")
     if (month < 1 or month > 12):
         raise ValueError("month should be in range 1-12")
@@ -18,7 +19,7 @@ def _extract_historical_month_data(year: int, month: int):
 
 
 def _extract_historical_year_data(year):
-    if isinstance(year, int):
+    if not isinstance(year, int):
         raise TypeError("year should be an integer")
     try:
         return api_data_utils._fetch_currency_data_for_year(year)

@@ -24,7 +24,7 @@ def _parse_and_fix_json_string(unformatted_string: str) -> dict:
         formatted_string = unformatted_string.replace("\'", "\"").replace("True", "true")
         return json.loads(formatted_string)
     except json.JSONDecodeError as e:
-        raise ValueError(fInvalid JSON format for string.") from e
+        raise ValueError(f"Invalid JSON format for string.") from e
     except Exception as e:
         raise RuntimeError(f"An unexpected error occurred while parsing JSON string: {e}") from e
 
