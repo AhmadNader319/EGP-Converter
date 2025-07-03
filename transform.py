@@ -66,7 +66,7 @@ def _prepare_data_columns(historical_data_frame: pd.DataFrame) -> pd.DataFrame:
                 raise TypeError("Input cannot be None.")
             else:
                 raise TypeError("Input must be a Pandas DataFrame.")
-        return historical_data_frame.iloc[:, 3:6]
+        return historical_data_frame[['date', 'base', 'rates']]
     except IndexError as e: # slice out of bounds
         raise IndexError(f"Column index out of bounds: {e}.") from e
     except Exception as e:

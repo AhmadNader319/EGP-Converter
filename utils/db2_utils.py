@@ -1,5 +1,5 @@
 import ibm_db
-from .config import (DB2_NAME, DB2_HOSTNAME, DB2_PORT, PATH_TO_SSL, DB2_UID, DB2_PWD, DB2_HISTORICAL_TABLE)
+from .config import (DB2_NAME, DB2_HOSTNAME, DB2_PORT, PATH_TO_SSL, DB2_UID, DB2_PWD, CURRENCY_RATES)
 import csv
 import json
 
@@ -18,17 +18,20 @@ def _connect_to_database():
     print(conn)
     return conn
 
-def _insert_to_db(conn, table_name, column_name, data):
-    sql_insert = f"INSERT INTO {table_name} ({column_name}) VALUES (?)"
+def _insert_to_db(conn, table_name, column_names, data):
+    columns_str = ", ".join(column_names)
+    placeholders = ", ".join(["?"] * len(data))
+
+    sql_insert = f"INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})"
     stmt = ibm_db.prepare(conn, sql_insert)
 
-    full_api_response_string = str(data)
-    print("data before inserting: ", data)
-    ibm_db.bind_param(stmt, 1, full_api_response_string)
+    print("Data before inserting: ", data)
+
+    for i, value in enumerate(data):
+        ibm_db.bind_param(stmt, i + 1, value)
+
     ibm_db.execute(stmt)
-
     ibm_db.commit(conn)
-
     ibm_db.free_stmt(stmt)
 
 def _get_all_from_db(conn, table_name):
@@ -44,33 +47,3 @@ def _get_all_from_db(conn, table_name):
 
     ibm_db.free_stmt(stmt)
     return result
-
-def _get_historical_data_from_db(table_name="historical_rates_2013_05"):
-    try:
-        conn = _connect_to_database()
-        sql_select = f"SELECT * FROM {table_name}"
-        print(f"Executing SQL: {sql_select}")
-        stmt = ibm_db.prepare(conn, sql_select)
-        ibm_db.execute(stmt)
-
-        result = []
-        row_count = 0
-        row = ibm_db.fetch_assoc(stmt)
-        while row:
-            row_count += 1
-            print(f"Fetched row {row_count}: {row}") # Print each row as it's fetched
-            result.append(row)
-            result.append('\\n')
-            row = ibm_db.fetch_assoc(stmt)
-
-        print(f"Total rows fetched: {row_count}")
-        ibm_db.free_stmt(stmt)
-        return result
-    except TypeError as e:
-        raise RuntimeError(f"Type error encountered: {e}") from e
-    except AttributeError as e:
-        raise RuntimeError(f"Attribute error encountered: {e}") from e
-    except NameError as e:
-        raise RuntimeError(f"Name error encountered: {e}") from e
-    except Exception as e:
-        raise RuntimeError(f"An unexpected error occurred: {e}") from e
