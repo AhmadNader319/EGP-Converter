@@ -8,6 +8,3 @@ def _format_date_component(component: int):
         return f"0{component}" if component < 10 else str(component)
     except TypeError as e:
         raise ValueError(f"Input component must be an integer, got type {type(component).__name__}.") from e # Value error for user-friendly Explanation
-
-
-print(_format_date_component(0))

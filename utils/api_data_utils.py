@@ -99,7 +99,7 @@ def _fetch_currency_data_for_month(year, month) -> dict:
     Handles potential None returns from _fetch_currency_data.
     """
     month_data = {}
-    for day in range(1, 32): # Range up to 32 to cover all days 1-31. Calendar logic might be needed for actual days in month.
+    for day in range(1, 2): # Range up to 32 to cover all days 1-31. Calendar logic might be needed for actual days in month.
         data_for_day = _fetch_currency_data(year, month, day)
         if data_for_day is not None:
             month_data[day] = data_for_day

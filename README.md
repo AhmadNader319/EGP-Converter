@@ -6,21 +6,22 @@
 
 ##  Index
 
-    1. [About The Project](#about-the-project)
-    2. [Key Features](#key-features)
-    3. [Built With](#built-with)
-    4. [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [API Key Setup](#api-key-setup)
-    - [DB2 Certificate & Credentials](#db2-certificate--credentials)
-    5. [Project Architecture](#project-architecture)
-    - [Database Schema](#database-schema)
+  1. [About The Project](#about-the-project)
+  2. [Key Features](#key-features)
+  3. [Built With](#built-with)
+  4. [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [API Key Setup](#api-key-setup)
+  - [DB2 Certificate & Credentials](#db2-certificate--credentials)
+  5. [Project Architecture](#project-architecture)
+  - [Database Schema](#database-schema)
     - [API Endpoints](#api-endpoints)
-    6. [Roadmap & Ideas](#roadmap-ideas)
+  6. [Roadmap & Ideas](#roadmap-ideas)
 
 
 ---
+
 
 ## About The Project
 
@@ -140,6 +141,7 @@ ERD (ER Diagram)
 
 ---
 
+![Example rates](images/top_10_db.png)
 ### API Endpoints
 
 | Purpose          | Endpoint Example                                                                                   |
