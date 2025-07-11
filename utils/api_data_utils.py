@@ -1,142 +1,149 @@
-import requests
-import time
-from .config import (BASE_URL, ACCESS_KEY)
-from .conversion_utils import _format_date_component
+from utils import api_data_utils
+from utils import db2_utils
+from utils import csv_utils
 
-print(_format_date_component(5))
+def _extract_historical_month_data(year: int, month: int):
+    """
+    Gets historical currency exchange rates for a specific month.
 
-# --- Fetch current/latest data https://api.exchangeratesapi.io/v1/latest?access_key=API_KEY in real-time
-def _get_api_latest_data():
-    url = f"{BASE_URL}latest?access_key={ACCESS_KEY}"
-    print(url)
+    Args:
+        year (int): The year you want to get data for (e.g., 2023).
+        month (int): The month you want to get data for (from 1 for January to 12 for December).
+
+    Returns:
+        dict: A dictionary (like a collection of data) containing the currency rates for that month.
+
+    Raises:
+        TypeError: If 'year' or 'month' are not whole numbers.
+        ValueError: If 'month' is not between 1 and 12.
+        RuntimeError: If there's a problem connecting to the currency service
+                      or if something else unexpected goes wrong.
+    """
+    # This line is mostly for checking and can be removed in the final code.
+    # It prints the type of 'year' and 'month' to help during development.
+    print(type(year), " : ", type(month))
+
+    # Check if 'year' is a whole number. If not, stop and show an error.
+    if not isinstance(year, int):
+        raise TypeError("year should be a whole number (integer)")
+    # Check if 'month' is a whole number. If not, stop and show an error.
+    if not isinstance(month, int):
+        raise TypeError("month should be a whole number (integer)")
+    # Check if 'month' is a valid month (between 1 and 12). If not, stop and show an error.
+    if (month < 1 or month > 12):
+        raise ValueError("month should be in range 1-12")
+
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        print("data fetched:", data)
-        print("Latest Currency API Data Fetched Successfully!")
-        return data
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error fetching currency data: {e} (Status Code: {e.response.status_code})")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.ConnectionError as e:
-        print(f"Connection Error fetching currency data: {e} (Network problem like DNS failure, refused connection, etc.)")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.Timeout as e:
-        print(f"Timeout Error fetching currency data: {e} (The request timed out)")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f"General Request Error fetching currency data: {e} (Catch-all for other request issues)")
-        print("data fetched: None")
-        return None
-    except ValueError as e:
-        print(f"JSON Decoding Error: The API response could not be parsed as JSON: {e}")
-        print("data fetched: None")
-        return None
+        # This calls another tool (_fetch_currency_data_for_month) to get the actual data
+        # from an online currency exchange service (API).
+        return api_data_utils._fetch_currency_data_for_month(year, month)
+    except (ConnectionError, TimeoutError):
+        # If the script can't connect to the online service or if it takes too long,
+        # it will stop and show an error message.
+        raise RuntimeError("Failed to connect to the currency rates API")
     except Exception as e:
-        print(f"An unexpected error occurred in _get_api_latest_data: {e}")
-        print("data fetched: None")
-        return None
-    finally:
-        time.sleep(4)
+        # If any other unexpected problem happens, it will stop and show a general error.
+        raise RuntimeError(f"An unexpected error occurred during data fetching. Details: {e}")
 
 
-# --- Fetch Historical data from the API ---
-def _get_api_data_for_date(year, month, day):
-    formatted_month = _format_date_component(month)
-    formatted_day = _format_date_component(day)
-    url = f"{BASE_URL}{year}-{formatted_month}-{formatted_day}?access_key={ACCESS_KEY}&symbols=EGP,USD,EUR,DZD&format=1"
-    print(url)
+def _extract_historical_year_data(year):
+    """
+    Gets historical currency exchange rates for a whole year.
+
+    Args:
+        year (int): The year you want to get data for (e.g., 2022).
+
+    Returns:
+        dict: A dictionary containing the currency rates for that entire year.
+
+    Raises:
+        TypeError: If 'year' is not a whole number.
+        RuntimeError: If there's a problem connecting to the currency service
+                      or if something else unexpected goes wrong.
+    """
+    # Check if 'year' is a whole number. If not, stop and show an error.
+    if not isinstance(year, int):
+        raise TypeError("year should be a whole number (integer)")
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        print("data fetched:", data)
-        print("Currency API Data Fetched Successfully!")
-        return data
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error fetching currency data for {year}-{formatted_month}-{formatted_day}: {e} (Status Code: {e.response.status_code})")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.ConnectionError as e:
-        print(f"Connection Error fetching currency data for {year}-{formatted_month}-{formatted_day}: {e} (Network problem)")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.Timeout as e:
-        print(f"Timeout Error fetching currency data for {year}-{formatted_month}-{formatted_day}: {e} (The request timed out)")
-        print("data fetched: None")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f"General Request Error fetching currency data for {year}-{formatted_month}-{formatted_day}: {e}")
-        print("data fetched: None")
-        return None
-    except ValueError as e: # This handles json.JSONDecodeError if response.json() fails
-        print(f"JSON Decoding Error for {year}-{formatted_month}-{formatted_day}: The API response could not be parsed as JSON: {e}")
-        print("data fetched: None")
-        return None
+        # This calls another tool (_fetch_currency_data_for_year) to get the data
+        # from an online currency exchange service (API) for the entire year.
+        return api_data_utils._fetch_currency_data_for_year(year)
+    except (ConnectionError, TimeoutError):
+        # If the script can't connect to the online service or if it takes too long,
+        # it will stop and show an error message.
+        raise RuntimeError("Failed to connect to the currency rates API")
     except Exception as e:
-        print(f"An unexpected error occurred in _get_api_data_for_date for {year}-{formatted_month}-{formatted_day}: {e}")
-        print("data fetched: None")
-        return None
-    finally:
-        time.sleep(4) # This will execute whether an exception occurred or not
+        # If any other unexpected problem happens, it will stop and show a general error.
+        raise RuntimeError(f"An unexpected error occurred during data fetching. Details: {e}")
 
-def _fetch_currency_data(year: int, month: int, day: int) -> dict:
+def _extract_historical_data_from_db(table_name = "historical_rates_2013_05"):
     """
-    Fetches currency data for a specific date.
-    This function acts as a wrapper around _get_api_data_for_date.
-    Its error handling relies on the wrapped function.
-    """
-    return _get_api_data_for_date(year, month, day)
+    Gets historical currency exchange rates from a database table.
 
-# --- Fetch currency data for a month
-def _fetch_currency_data_for_month(year, month) -> dict:
-    """
-    Fetches currency data for each day of a given month.
-    Handles potential None returns from _fetch_currency_data.
-    """
-    month_data = {}
-    for day in range(1, 2): # Range up to 32 to cover all days 1-31. Calendar logic might be needed for actual days in month.
-        data_for_day = _fetch_currency_data(year, month, day)
-        if data_for_day is not None:
-            month_data[day] = data_for_day
-        else:
-            print(f"Warning: Could not fetch data for {year}-{month}-{day}. Skipping this day.")
-    return month_data
+    Args:
+        table_name (str, optional): The name of the table in the database
+                                    where the historical data is stored.
+                                    By default, it looks for "historical_rates_2013_05".
 
-# --- Fetch currency data for a year (01-MM for a year)
-def _fetch_currency_data_for_year(year) -> dict:
+    Returns:
+        list: A list of data from the specified database table.
+              The exact format of the list depends on what the database tool returns.
     """
-    Fetches currency data for the first day of each month in a given year.
-    Handles potential None returns from _fetch_currency_data.
-    """
-    year_data = {}
-    for month in range(1, 13): # Range for all 12 months
-        data_for_month = _fetch_currency_data(year, month, 1) # Fetching for the 1st day of each month
-        if data_for_month is not None:
-            year_data[month] = data_for_month
-        else:
-            print(f"Warning: Could not fetch data for {year}-{month}-01. Skipping this month.")
-    return year_data
+    # This calls a database tool (_get_historical_data_from_db) to read information
+    # from a specific table in your database.
+    return db2_utils._get_historical_data_from_db(table_name)
 
-# --- Fetch currency data for a time series (30 consecutive days at most)
-def _fetch_currency_data_for_time_series(year: int, month: int, start_day: int, end_day: int) -> dict:
+def _extract_latest_data():
     """
-    Fetches currency data for a specified range of days within a month.
-    Handles potential None returns from _fetch_currency_data.
-    """
-    time_series_data = {}
-    if not (1 <= start_day <= 31 and 1 <= end_day <= 31 and start_day <= end_day):
-        print(f"Error: Invalid start_day ({start_day}) or end_day ({end_day}) provided for time series.")
-        return {}
+    Gets the most recent (latest) currency exchange rates.
 
-    for day in range(start_day, end_day + 1):
-        data_for_day = _fetch_currency_data(year, month, day)
-        if data_for_day is not None:
-            time_series_data[day] = data_for_day
-        else:
-            print(f"Warning: Could not fetch data for {year}-{month}-{day} in time series. Skipping this day.")
-    return time_series_data
+    Returns:
+        dict: A dictionary containing the very latest currency rates.
+
+    Raises:
+        RuntimeError: If there's a problem connecting to the currency service
+                      or if something else unexpected goes wrong.
+    """
+    try:
+        # This calls a tool (_get_api_latest_data) to get the most up-to-date
+        # currency rates from an online service (API).
+        return api_data_utils._get_api_latest_data()
+    except (ConnectionError, TimeoutError):
+        # If the script can't connect to the online service or if it takes too long,
+        # it will stop and show an error message.
+        raise RuntimeError("Failed to connect to the currency rates API")
+    except Exception as e:
+        # If any other unexpected problem happens, it will stop and show a general error.
+        raise RuntimeError(f"An unexpected error occurred during data fetching. Details: {e}")
+
+def _save_historical_data_into_csv(csv_file_name = "/Users/ahmednader/Desktop/Code Repository/EGP-Converter/historical.csv"):
+    """
+    Gets historical data from the database and saves it into a CSV file.
+
+    A CSV file is a simple text file that can be opened in spreadsheet programs like Excel.
+
+    Args:
+        csv_file_name (str, optional): The full path and name of the CSV file
+                                       where the data will be saved.
+                                       By default, it saves to a specific path on Ahmed Nader's desktop.
+    """
+    # First, get the historical data from the database.
+    historical_data = _extract_historical_data_from_db()
+    # Then, use a CSV tool (_load_list_to_csv) to save this data into the specified CSV file.
+    csv_utils._load_list_to_csv(csv_file_name, historical_data)
+
+def _fetch_historical_data_from_csv(csv_file_name = "/Users/ahmednader/Desktop/Code Repository/EGP-Converter/historical.csv"):
+    """
+    Reads historical data from a CSV file.
+
+    Args:
+        csv_file_name (str, optional): The full path and name of the CSV file
+                                       to read data from.
+                                       By default, it reads from a specific path on Ahmed Nader's desktop.
+
+    Returns:
+        list: A list of data read from the CSV file.
+              The exact format of the list depends on how the CSV tool reads the file.
+    """
+    # This calls a CSV tool (_read_from_csv) to read information from the specified CSV file.
+    return csv_utils._read_from_csv(csv_file_name)
