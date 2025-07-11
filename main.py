@@ -127,10 +127,6 @@ def run_data_pipeline():
             print("Could not establish a connection to the database. Skipping insertion.")
     except Exception as e:
         print(f"An error occurred during database connection or insertion: {e}")
-    finally:
-        # Ensure the database connection is closed
-        if conn:
-            db2_utils._close_connection(conn) # Assuming a _close_connection method exists in db2_utils
 
 if __name__ == "__main__":
     run_data_pipeline()
