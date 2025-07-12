@@ -25,7 +25,7 @@
 
 ## About The Project
 
-This project provides an extensible framework for **extracting, transforming, and loading (ETL)** currency exchange rates using the [exchangeratesapi API](https://exchangeratesapi.io), persisting them to a simulated **IBM DB2** backend, and performing **currency conversions** using both live and historical rates.  
+This project provides an extensible framework for **extracting, transforming, and loading (ETL)** currency exchange rates using the [exchangeratesapi API](https://exchangeratesapi.io), persisting them to a simulated **IBM DB2** backend, and performing **currency conversions** using both live and historical rates. 
 It supports:
 - Automated daily, monthly, and annual collection of rates
 - Historical queries for arbitrary dates and ranges
@@ -49,8 +49,14 @@ It supports:
 
 - **Python** 3.x
 - `requests`
-- `ibm_db`
+- `pandas`
 - `time`
+- `ibm_db`
+- `fastapi`
+- `uvicorn`
+- `gunicorn`
+
+- This project requires the following Python packages, as specified in `requirements.txt`
 
 ---
 
@@ -58,7 +64,7 @@ It supports:
 
 ### Prerequisites
 
-1. **API Key**  
+1. **API Key** 
    - Register at [exchangeratesapi](https://exchangeratesapi.io) and obtain your personal API key.
 
 2. **IBM DB2 Credentials** (don't forget the ssl certificate)

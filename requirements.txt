@@ -1,0 +1,6 @@
+requests==2.32.3
+ibm_db==3.2.6 
+pandas==2.2.3 
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+gunicorn==23.0.0 
