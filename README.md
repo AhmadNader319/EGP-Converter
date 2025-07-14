@@ -132,23 +132,21 @@ The database schema is designed to efficiently store daily exchange rates for se
 ```
 ERD (ER Diagram)
     CURRENCY_RATES {
-        timestamp date
-        varchar base
-        numeric EGP_Rate
-        numeric USD_Rate
-        numeric EUR_Rate
-        numeric DZD_Rate
+        RATE_ID: int
+        RATE_DATE: date
+        BASE_CURRENCY_CODE: str
+        TARGET_CURRENCY_CODE: str
+        EXCHANGE_RATE: Decimal
     }
 ```
 
-| Column     | Type           | Description                     |
-|------------|----------------|---------------------------------|
-| date       | `timestamp`    | Date of the rate                |
-| base       | `varchar(3)`   | Base currency code              |
-| EGP_Rate   | `numeric(1,6)` | Egyptian Pound rate             |
-| USD_Rate   | `numeric(1,6)` | US Dollar rate                  |
-| EUR_Rate   | `numeric(1,6)` | Euro rate                       |
-| DZD_Rate   | `numeric(1,6)` | Algerian Dinar rate             |
+| Column     | Type           |
+|------------|----------------|
+| RATE_ID       | `Integer`    |
+| RATE_DATE       | `Date`   |
+| BASE_CURRENCY_CODE   | `varchar(3)` |
+| TARGET_CURRENCY_CODE   | `varchar(3)` |
+| EXCHANGE_RATE   | `numeric(18,6)` |
 
 ---
 
