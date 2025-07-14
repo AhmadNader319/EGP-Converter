@@ -1,7 +1,7 @@
 import pandas as pd
-from export import _extract_historical_year_data, _extract_historical_month_data
-from transform import _prepare_data_columns, _load_json_into_df, _parse_and_fix_json_string
-from utils import db2_utils
+from .export import _extract_historical_year_data, _extract_historical_month_data
+from .transform import _prepare_data_columns, _load_json_into_df, _parse_and_fix_json_string
+from ..utils import db2_utils
 
 def _process_historical_data(historical_data_raw: dict) -> pd.DataFrame:
     """

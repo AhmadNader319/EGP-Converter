@@ -1,8 +1,8 @@
 import ibm_db # This is a special tool to talk to IBM Db2 databases
-from .config import (DB2_NAME, DB2_HOSTNAME, DB2_PORT, PATH_TO_SSL, DB2_UID, DB2_PWD, CURRENCY_RATES)
+from ..core.config import (DB2_NAME, DB2_HOSTNAME, DB2_PORT, PATH_TO_SSL, DB2_UID, DB2_PWD, CURRENCY_RATES)
 import csv # A tool for working with CSV files (like simple spreadsheets)
 import json # A tool for working with JSON data (a way to store information)
-
+print(DB2_NAME)
 def _connect_to_database():
     """
     Connects to the Db2 database.
