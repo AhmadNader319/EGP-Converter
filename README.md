@@ -22,14 +22,19 @@
 
 ---
 
+## 📌 About The Project
 
-## About The Project
+This project provides an extensible framework for:
+- Extracting, transforming, and loading (ETL) currency exchange rates using exchangeratesapi.io.
+- Persisting data to an IBM DB2 backend.
+- Performing currency conversions using both live and historical rates.
 
-This project provides an extensible framework for **extracting, transforming, and loading (ETL)** currency exchange rates using the [exchangeratesapi API](https://exchangeratesapi.io), persisting them to a simulated **IBM DB2** backend, and performing **currency conversions** using both live and historical rates. 
-It supports:
-- Automated daily, monthly, and annual collection of rates
-- Historical queries for arbitrary dates and ranges
-- Conversion between key currencies, supporting both real-time and archival data
+It serves as both a local ETL execution toolkit and a backend API service. The backend, built with FastAPI, exposes endpoints to run ETL processes on demand, fetch historical exchange data, and perform currency conversions programmatically via HTTP APIs.
+
+### Supported Features:
+- Automated data collection (daily, monthly, annual)
+- Historical queries by date or currency pair
+- Currency conversion between supported currencies (EUR, USD, EGP, DZD)
 
 ---
 
@@ -154,6 +159,30 @@ ERD (ER Diagram)
 |------------------|--------------------------------------------------------------------------------------------------|
 | Latest Rates     | `https://api.exchangeratesapi.io/v1/latest?access_key=API_KEY`                                       |
 | Historical Rates | `https://api.exchangeratesapi.io/v1/YYYY-MM-DD?access_key={API_KEY}`             |
+
+###ETL API-Backend 
+- Fetch and save new data into the DB2 database.
+
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/etl/historical/month` | Fetch historical data for a specific month | `year`, `month` |
+| `/etl/historical/year` | Fetch historical data for a specific year | `year` |
+
+> Year data: fetches the first day of each month.
+> Month data: fetches daily data for the month.
+
+### Rates API
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/rates/` | Fetch all historical rates | Optional: `base_code`, `target_code` |
+| `/rates/{date}` | Fetch rates for a specific date | `date`, `target_code` |
+
+###Currency Conversion API
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/convert` | Convert an amount from EUR to a target currency on a given date | `amount`, `date`, `base_code`, `target_code` |
+
+Example: Convert 100 EUR to USD on 2025-07-01.
 
 ---
 
