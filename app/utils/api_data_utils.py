@@ -1,6 +1,6 @@
 import requests # Used for making HTTP requests to web services (APIs)
 import time     # Used for pausing the program (e.g., to avoid hitting API limits)
-from .config import (BASE_URL, ACCESS_KEY) # Imports sensitive information (API base URL and access key) from a config file
+from ..core.config import (BASE_URL, ACCESS_KEY) # Imports sensitive information (API base URL and access key) from a config file
 from .conversion_utils import _format_date_component # Imports a helper function for formatting date parts
 
 # This line is likely for testing the _format_date_component function when the script runs directly.

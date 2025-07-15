@@ -22,14 +22,19 @@
 
 ---
 
+## 📌 About The Project
 
-## About The Project
+This project provides an extensible framework for:
+- Extracting, transforming, and loading (ETL) currency exchange rates using exchangeratesapi.io.
+- Persisting data to an IBM DB2 backend.
+- Performing currency conversions using both live and historical rates.
 
-This project provides an extensible framework for **extracting, transforming, and loading (ETL)** currency exchange rates using the [exchangeratesapi API](https://exchangeratesapi.io), persisting them to a simulated **IBM DB2** backend, and performing **currency conversions** using both live and historical rates. 
-It supports:
-- Automated daily, monthly, and annual collection of rates
-- Historical queries for arbitrary dates and ranges
-- Conversion between key currencies, supporting both real-time and archival data
+It serves as both a local ETL execution toolkit and a backend API service. The backend, built with FastAPI, exposes endpoints to run ETL processes on demand, fetch historical exchange data, and perform currency conversions programmatically via HTTP APIs.
+
+### Supported Features:
+- Automated data collection (daily, monthly, annual)
+- Historical queries by date or currency pair
+- Currency conversion between supported currencies (EUR, USD, EGP, DZD)
 
 ---
 
@@ -127,23 +132,21 @@ The database schema is designed to efficiently store daily exchange rates for se
 ```
 ERD (ER Diagram)
     CURRENCY_RATES {
-        timestamp date
-        varchar base
-        numeric EGP_Rate
-        numeric USD_Rate
-        numeric EUR_Rate
-        numeric DZD_Rate
+        RATE_ID: int
+        RATE_DATE: date
+        BASE_CURRENCY_CODE: str
+        TARGET_CURRENCY_CODE: str
+        EXCHANGE_RATE: Decimal
     }
 ```
 
-| Column     | Type           | Description                     |
-|------------|----------------|---------------------------------|
-| date       | `timestamp`    | Date of the rate                |
-| base       | `varchar(3)`   | Base currency code              |
-| EGP_Rate   | `numeric(1,6)` | Egyptian Pound rate             |
-| USD_Rate   | `numeric(1,6)` | US Dollar rate                  |
-| EUR_Rate   | `numeric(1,6)` | Euro rate                       |
-| DZD_Rate   | `numeric(1,6)` | Algerian Dinar rate             |
+| Column     | Type           |
+|------------|----------------|
+| RATE_ID       | `Integer`    |
+| RATE_DATE       | `Date`   |
+| BASE_CURRENCY_CODE   | `varchar(3)` |
+| TARGET_CURRENCY_CODE   | `varchar(3)` |
+| EXCHANGE_RATE   | `numeric(18,6)` |
 
 ---
 
@@ -154,6 +157,30 @@ ERD (ER Diagram)
 |------------------|--------------------------------------------------------------------------------------------------|
 | Latest Rates     | `https://api.exchangeratesapi.io/v1/latest?access_key=API_KEY`                                       |
 | Historical Rates | `https://api.exchangeratesapi.io/v1/YYYY-MM-DD?access_key={API_KEY}`             |
+
+###ETL API-Backend 
+- Fetch and save new data into the DB2 database.
+
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/etl/historical/month` | Fetch historical data for a specific month | `year`, `month` |
+| `/etl/historical/year` | Fetch historical data for a specific year | `year` |
+
+> Year data: fetches the first day of each month.
+> Month data: fetches daily data for the month.
+
+### Rates API
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/rates/` | Fetch all historical rates | Optional: `base_code`, `target_code` |
+| `/rates/{date}` | Fetch rates for a specific date | `date`, `target_code` |
+
+###Currency Conversion API
+| Endpoint | Description | Inputs |
+|----------|-------------|--------|
+| `/convert` | Convert an amount from EUR to a target currency on a given date | `amount`, `date`, `base_code`, `target_code` |
+
+Example: Convert 100 EUR to USD on 2025-07-01.
 
 ---
 

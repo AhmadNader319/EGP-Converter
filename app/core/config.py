@@ -2,8 +2,8 @@ import ibm_db
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env.api file
-load_dotenv(dotenv_path='/Users/ahmednader/Desktop/Code Repository/EGP-Converter/.env.api')
+# Load environment variables from .env file
+load_dotenv(dotenv_path='/Users/ahmednader/Desktop/Code Repository/EGP-Converter/.env')
 
 DB2_NAME = os.getenv("DB2_NAME")
 DB2_HOSTNAME = os.getenv("DB2_HOSTNAME")

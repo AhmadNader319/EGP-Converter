@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import csv_utils
+from ..utils import csv_utils
 
 def _load_rates_to_csv(csv_file_name, dataframe):
     """
