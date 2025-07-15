@@ -47,21 +47,26 @@ def _process_historical_data(historical_data_raw: dict) -> pd.DataFrame:
         print(f"Error preparing data columns: {e}")
         return pd.DataFrame()
 
-
-def _run_year_pipeline(year):
+def run_historical_pipeline(year, month=None):
     """
-        Runs the main data pipeline for extracting, processing, and loading historical currency rates.
+    Runs the data pipeline to extract, process, and load historical currency rates
+    for either a full year or a specific month if provided.
 
-        The pipeline offers the Extracttion of historical data for a full year.
-
-    After extraction, the data is processed and then inserted into a Db2 database
-    table named 'CURRENCY_RATES'.
+    Args:
+        year (int): The year of historical data to extract.
+        month (int, optional): The month (1-12). If None, extracts the full year.
     """
     historical_data_raw = None
+
     try:
-        historical_data_raw = _extract_historical_year_data(year)
+        if month:
+            historical_data_raw = _extract_historical_month_data(year, month)
+            print(f"Extracted data for {year}-{month:02d}")
+        else:
+            historical_data_raw = _extract_historical_year_data(year)
+            print(f"Extracted data for year {year}")
     except ValueError:
-        print("Invalid year entered. Please enter a number.")
+        print("Invalid year or month entered. Please enter numbers.")
         return
 
     if historical_data_raw is None:
@@ -73,98 +78,34 @@ def _run_year_pipeline(year):
         print("No rates data to load into the database. Exiting.")
         return
 
-    # Display the processed DataFrame
     print(rates_df)
 
     conn = None
     try:
-        # Establish a connection to the Db2 database
         conn = db2_utils._connect_to_database()
         if conn:
             print("\nConnected to Db2. Inserting data...")
-            # Iterate over each row in the processed DataFrame for insertion
             for index, row in rates_df.iterrows():
                 rate_date = row['date']
                 base_currency_code = row['base']
-                target_currency_code_dict = row['rates'] # 'rates' column is expected to be a dictionary
+                target_currency_code_dict = row['rates']
 
-                # Iterate through the target currencies and their exchange rates
                 for target_code, exchange_rate in target_currency_code_dict.items():
                     try:
-                        # Insert each currency rate record into the database
                         db2_utils._insert_to_db(
                             conn,
-                            "CURRENCY_RATES", # Table name
-                            ['rate_date', 'base_currency_code', 'target_currency_code', 'exchange_rate'], # Column names
-                            [rate_date, base_currency_code, target_code, exchange_rate] # Values
+                            "CURRENCY_RATES",
+                            ['rate_date', 'base_currency_code', 'target_currency_code', 'exchange_rate'],
+                            [rate_date, base_currency_code, target_code, exchange_rate]
                         )
-                        print(f"Successfully inserted: Date={rate_date}, Base={base_currency_code}, Target={target_code}, Rate={exchange_rate}")
+                        print(f"Inserted: Date={rate_date}, Base={base_currency_code}, Target={target_code}, Rate={exchange_rate}")
                     except Exception as e:
-                        # Log errors for individual record insertions
-                        print(f"Failed to insert record: {rate_date}, {base_currency_code}, {target_code}. Error: {e}")
-            print("Data insertion process completed.")
+                        print(f"Failed to insert: {rate_date}, {base_currency_code}, {target_code}. Error: {e}")
+            print("Data insertion completed.")
         else:
-            print("Could not establish a connection to the database. Skipping insertion.")
+            print("Could not establish a database connection. Skipping insertion.")
     except Exception as e:
-        print(f"An error occurred during database connection or insertion: {e}")
+        print(f"Database error: {e}")
 
-def _run_month_pipeline(year, month):
-    """
-        Runs the main data pipeline for extracting, processing, and loading historical currency rates.
-
-        The pipeline offers the Extracttion of historical data for a specific month.
-
-    After extraction, the data is processed and then inserted into a Db2 database
-    table named 'CURRENCY_RATES'.
-    """
-    historical_data_raw = None
-    try:
-        historical_data_raw = _extract_historical_month_data(year, month)
-    except ValueError:
-        print("Invalid year entered. Please enter a number.")
-        return
-
-    if historical_data_raw is None:
-        print("No historical data extracted. Exiting.")
-        return
-
-    rates_df = _process_historical_data(historical_data_raw)
-    if rates_df.empty:
-        print("No rates data to load into the database. Exiting.")
-        return
-
-    # Display the processed DataFrame
-    print(rates_df)
-
-    conn = None
-    try:
-        # Establish a connection to the Db2 database
-        conn = db2_utils._connect_to_database()
-        if conn:
-            print("\nConnected to Db2. Inserting data...")
-            # Iterate over each row in the processed DataFrame for insertion
-            for index, row in rates_df.iterrows():
-                rate_date = row['date']
-                base_currency_code = row['base']
-                target_currency_code_dict = row['rates'] # 'rates' column is expected to be a dictionary
-
-                # Iterate through the target currencies and their exchange rates
-                for target_code, exchange_rate in target_currency_code_dict.items():
-                    try:
-                        # Insert each currency rate record into the database
-                        db2_utils._insert_to_db(
-                            conn,
-                            "CURRENCY_RATES", # Table name
-                            ['rate_date', 'base_currency_code', 'target_currency_code', 'exchange_rate'], # Column names
-                            [rate_date, base_currency_code, target_code, exchange_rate] # Values
-                        )
-                        print(f"Successfully inserted: Date={rate_date}, Base={base_currency_code}, Target={target_code}, Rate={exchange_rate}")
-                    except Exception as e:
-                        # Log errors for individual record insertions
-                        print(f"Failed to insert record: {rate_date}, {base_currency_code}, {target_code}. Error: {e}")
-            print("Data insertion process completed.")
-        else:
-            print("Could not establish a connection to the database. Skipping insertion.")
-    except Exception as e:
-        print(f"An error occurred during database connection or insertion: {e}")
-
+if __name__ == "__main__":
+    run_historical_pipeline(2018, 4)
