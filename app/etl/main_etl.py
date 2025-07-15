@@ -100,7 +100,11 @@ def run_historical_pipeline(year, month=None):
                         )
                         print(f"Inserted: Date={rate_date}, Base={base_currency_code}, Target={target_code}, Rate={exchange_rate}")
                     except Exception as e:
-                        print(f"Failed to insert: {rate_date}, {base_currency_code}, {target_code}. Error: {e}")
+                        if "SQL0803N" in str(e):
+                            print(f"Duplicate record skipped: {rate_date}, {base_currency_code}, {target_code}")
+                        else:
+                            print(f"Failed to insert: {rate_date}, {base_currency_code}, {target_code}. Error: {e}")
+
             print("Data insertion completed.")
         else:
             print("Could not establish a database connection. Skipping insertion.")
@@ -108,4 +112,4 @@ def run_historical_pipeline(year, month=None):
         print(f"Database error: {e}")
 
 if __name__ == "__main__":
-    run_historical_pipeline(2018, 4)
+    run_historical_pipeline(2001)
