@@ -106,3 +106,40 @@ def _get_all_from_db(conn, table_name):
     # Cleans up the statement after use.
     ibm_db.free_stmt(stmt)
     return result # Gives back the list of all rows.
+
+def _run_sql_query(conn, sql_stmt):
+    """
+    Gets all the information (all rows and columns) from a specific table in the database.
+
+    Args:
+        conn (ibm_db.Connection): The active connection to the database.
+        table_name (str): The name of the table from which you want to get data.
+
+    Returns:
+        list: A list where each item is a dictionary (like a small collection of data)
+              representing one row from the database table.
+    """
+    # Prepares the SQL command.
+    stmt = ibm_db.prepare(conn, sql_stmt)
+    # Runs the SQL command to get the data.
+    ibm_db.execute(stmt)
+
+    result = [] # This list will hold all the rows we get from the database.
+    # Gets the first row of data as a dictionary.
+    row = ibm_db.fetch_assoc(stmt)
+    # Continues to get rows until there are no more.
+    while row:
+        result.append(row) # Adds the current row to our list.
+        row = ibm_db.fetch_assoc(stmt) # Gets the next row.
+
+    # Cleans up the statement after use.
+    ibm_db.free_stmt(stmt)
+    return result # Gives back the list of all rows.
+
+
+if __name__ == "__main__":
+    conn = _connect_to_database()
+    query = f"select exchange_rate from {CURRENCY_RATES} where rate_date = '2000-02-01' and TARGET_CURRENCY_CODE = 'USD'"
+    exchange_rate = _run_sql_query(conn, query)
+    print(f"exchange rate {exchange_rate}")
+    print(float(exchange_rate[0]["EXCHANGE_RATE"]))
