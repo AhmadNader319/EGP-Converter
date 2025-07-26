@@ -2,6 +2,7 @@ import pandas as pd
 from .export import _extract_historical_year_data, _extract_historical_month_data
 from .transform import _prepare_data_columns, _load_json_into_df, _parse_and_fix_json_string
 from ..utils import db2_utils
+from ..utils import conversion_utils
 
 def _process_historical_data(historical_data_raw: dict) -> pd.DataFrame:
     """
@@ -57,10 +58,10 @@ def run_historical_pipeline(year, month=None):
         month (int, optional): The month (1-12). If None, extracts the full year.
     """
     historical_data_raw = None
-
     try:
         if month:
-            historical_data_raw = _extract_historical_month_data(year, month)
+            formatted_month = conversion_utils._format_date_component(month)
+            historical_data_raw = _extract_historical_month_data(year, int(formatted_month))
             print(f"Extracted data for {year}-{month:02d}")
         else:
             historical_data_raw = _extract_historical_year_data(year)
@@ -112,4 +113,4 @@ def run_historical_pipeline(year, month=None):
         print(f"Database error: {e}")
 
 if __name__ == "__main__":
-    run_historical_pipeline(2001)
+    run_historical_pipeline(2000)
