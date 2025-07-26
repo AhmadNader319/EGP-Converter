@@ -61,7 +61,7 @@ def run_historical_pipeline(year, month=None):
     try:
         if month:
             formatted_month = conversion_utils._format_date_component(month)
-            historical_data_raw = _extract_historical_month_data(year, formatted_month)
+            historical_data_raw = _extract_historical_month_data(year, int(formatted_month))
             print(f"Extracted data for {year}-{month:02d}")
         else:
             historical_data_raw = _extract_historical_year_data(year)
