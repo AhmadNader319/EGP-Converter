@@ -1,41 +1,39 @@
-# app/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-import os # Import os for potential environment variable usage or path handling
 
-# Import the APIRouter instances from your api sub-package
-# Ensure these files (rates.py, etl.py) exist in app/api/
+from .core import config
 from .api import rates
 from .api import etl
 
-# Initialize the FastAPI application
+# Initialize FastAPI app
 app = FastAPI(
     title="EGP Currency Converter API",
     description="API for historical currency exchange rate conversions and ETL management.",
     version="1.0.0",
-    # You can customize documentation URLs or disable them if needed
-    # docs_url="/documentation",
-    # redoc_url=None,
 )
 
-# Router for currency conversion endpoints
-app.include_router(rates.router, prefix="/currency", tags=["Currency Conversion"])
+# CORS configuration
+origins = config.CORS_ORIGINS
 
-# Router for ETL management endpoints
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,                                  # Allowed origins from .env
+    allow_credentials=False if "*" in origins else True,    # Credentials only if not using '*'
+    allow_methods=["*"],                                    # Allow all methods
+    allow_headers=["*"],                                    # Allow all headers
+)
+
+# Include API routers
+app.include_router(rates.router, prefix="/currency", tags=["Currency Conversion"])
 app.include_router(etl.router, prefix="/etl", tags=["ETL Management"])
 
-# Optional: Add a root endpoint to redirect directly to the OpenAPI documentation
+# Redirect root to docs
 @app.get("/", include_in_schema=False)
 async def root():
-    """
-    Redirects to the OpenAPI (Swagger UI) documentation for the API.
-    """
     return RedirectResponse(url="/docs")
 
-# Optional: Add a simple health check endpoint
+# Health check endpoint
 @app.get("/health", tags=["Monitoring"])
 async def health_check():
-    """
-    Provides a simple health check to indicate if the API is running.
-    """
     return {"status": "ok", "message": "API is running successfully!"}
